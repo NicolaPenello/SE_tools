@@ -10,6 +10,10 @@
     <Company>Schneider Electric</Company>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ManagedLzma" Version="0.2.0-alpha-7" />
   </ItemGroup>
