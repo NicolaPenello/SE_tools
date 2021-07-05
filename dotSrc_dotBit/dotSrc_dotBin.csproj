@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>icon_se_tools.ico</ApplicationIcon>
+    <Authors>Nicola Penello</Authors>
+    <Company>Schneider Electric</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ManagedLzma" Version="0.2.0-alpha-7" />
+  </ItemGroup>
+
+</Project>

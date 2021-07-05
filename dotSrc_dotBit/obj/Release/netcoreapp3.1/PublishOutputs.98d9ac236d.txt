@@ -1,0 +1,6 @@
+C:\Users\sesa556056\source\release\dotSrc_dotBin.exe
+C:\Users\sesa556056\source\release\dotSrc_dotBin.dll
+C:\Users\sesa556056\source\release\dotSrc_dotBin.deps.json
+C:\Users\sesa556056\source\release\dotSrc_dotBin.runtimeconfig.json
+C:\Users\sesa556056\source\release\dotSrc_dotBin.pdb
+C:\Users\sesa556056\source\release\ManagedLzma.dll

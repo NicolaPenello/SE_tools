@@ -1,0 +1,482 @@
+﻿using dotSrc_dotBit.LZMA;
+using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+
+namespace dotSrc_dotBit
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        private const string sourceSuffix = "src";
+        private const string binarySuffix = "bin";
+        private const string zipSuffix = "zip";
+        private const string sevenZipSuffix = "7z";
+        private const string twoCfSuffix = "2cf";
+
+        private const string DEVICE_DESCRIPTION = "DEVICE_DESCRIPTION";
+        private const string PRJ_NAME = "PRJ_NAME";
+        private const string PRJ_VERSION = "PRJ_VERSION";
+
+        private string fullName;            // STD =>  [app]_[verSTD]; ETO => [app]_[spec]_[verETO]
+        private string sevenZipFileName;    // [fullname]_src.7z        
+        private string srcFolderPath;       // 
+        private string binTargetPLAN1ADDRESSxxxPath;
+
+        private bool readyToGenerate = false;
+
+        private Regex regexApp = new Regex(@"^[a-zA-Z0-9]*$");
+        private Regex regexSpec = new Regex(@"^[a-zA-Z0-9]*$");
+        private Regex regexVersionSpecial = new Regex(@"^[1-9]\.[0-9]\d{0,1}\.[0-9][0-9][0-9]$");
+        private Regex regexVersionStandard = new Regex(@"^[1-9]\.[0-9]\d{0,1}$");
+      
+        
+        public MainWindow()
+        {
+            InitializeComponent();
+            IsSpecEnabled.IsChecked = false;
+        }
+
+
+        private void ChooseOtsButton_LeftClick(object sender, RoutedEventArgs e)
+        {
+            LogClear();
+
+            Microsoft.Win32.OpenFileDialog fileDialog = new Microsoft.Win32.OpenFileDialog();
+            fileDialog.Filter = "OneToolSolution files(*.ots)| *.ots";
+            if (fileDialog.ShowDialog() == true)
+            {
+                // source path is one level below from the .ots file
+                srcFolderPath = System.IO.Path.GetFullPath(fileDialog.FileName + $"\\..");
+
+                // print in the log textbox
+                StringPath.Text = srcFolderPath;
+
+                // look for the ADDRESS_*** directory and eventually loofk for the .2cf file
+                string binTargetPLAN1Path = $"{srcFolderPath}\\Bin\\Target\\pLAN1";
+                
+                var arrDirectories = Directory.GetDirectories(binTargetPLAN1Path);
+
+                // if no sub-directories or two or more sub-directories are found, then return
+                if (arrDirectories.Length == 0)
+                {
+                    LogWrite("Directory ADDRESS_*** does not exist");
+                    return;
+                }
+                else if (arrDirectories.Length > 1)
+                {
+                    LogWrite("Found more than one directory ADDRESS_***");
+                    return;
+                }
+
+                // exactly one sub-directory was found 
+                binTargetPLAN1ADDRESSxxxPath = arrDirectories.FirstOrDefault();
+
+                LogWrite($"Found one directory \"{binTargetPLAN1ADDRESSxxxPath}\"");
+
+                string file2cfPath = Directory.GetFiles(binTargetPLAN1ADDRESSxxxPath, $"*.{twoCfSuffix}").FirstOrDefault();
+
+                // if no .2cf file was found, then return
+                if (file2cfPath == null)
+                {
+                    LogWrite("File .2cf does not exist.");
+                    return;
+                }
+
+                // at least one .2cf file was found
+                LogWrite($"Found .2cf file at \"{file2cfPath}\"");
+
+                // try to retrieve the informations to populate the fields of the form by parsing the .2cf file (xml)
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.PreserveWhitespace = true;
+                try
+                {
+                    xmlDoc.LoadXml(File.ReadAllText(file2cfPath));
+                    LogWrite($"File .2cf correctly loaded");
+                }
+                catch (Exception exc)
+                {
+                    LogWrite($"File .2cf not loaded because of the following exception\n{exc.Message}\n");
+                    return;
+                }
+
+                XmlNode root = xmlDoc.GetElementsByTagName(DEVICE_DESCRIPTION)[0];
+                if (root == null)
+                {
+                    LogWrite($"Cannot find the xml node {DEVICE_DESCRIPTION}");
+                    return;
+                }
+                LogWrite($"Xml node {DEVICE_DESCRIPTION} was found");
+
+
+                string strPRJ_NAME = (root as XmlElement).GetAttribute(PRJ_NAME);
+                if (strPRJ_NAME == null)
+                {
+                    LogWrite($"Cannot find the xml attribute {PRJ_NAME}");
+                    return;
+                }
+                LogWrite($"Xml attribute \"{PRJ_NAME}\" was found and it is \"{strPRJ_NAME}\"");
+
+
+                string strPRJ_VERSION = (root as XmlElement).GetAttribute(PRJ_VERSION);
+                LogWrite(strPRJ_VERSION == null? $"Cannot find the xml attribute {PRJ_VERSION}" : $"Xml attribute {PRJ_VERSION} was found and it is {strPRJ_VERSION}");
+
+                // populate the form according to the just-retrieved informations
+                string[] splittedPRJ_NAME = strPRJ_NAME.Split('_');
+                // check if PRJ_NAME was correctly formatted  [app]_[spec]
+                if (splittedPRJ_NAME.Count() > 2)
+                {
+                    LogWrite("PRJ_NAME not correctly formatted in .2cf file");
+                    return;
+                }
+                else if(IsSpecEnabled.IsChecked == false && splittedPRJ_NAME.Count() > 1)
+                {
+                    LogWrite("PRJ_NAME for standard SW not correctly formatted in .2cf file");
+                    return;
+                }
+                else if(IsSpecEnabled.IsChecked == true && splittedPRJ_NAME.Count() < 2)
+                {
+                    LogWrite("PRJ_NAME for special SW not correctly formatted in .2cf file");
+                    return;
+                }
+                // we have the right format of the PRJ_NAME i.e. standard -> [app] ; special -> [app]_[spec]
+
+
+                StringApp.Text = regexApp.IsMatch(splittedPRJ_NAME[0]) ? splittedPRJ_NAME[0] : $"{splittedPRJ_NAME[0]} ==> Not valid app name in .2cf file ";
+                if (IsSpecEnabled.IsChecked == true) // SPECIAL
+                {
+                    StringSpec.Text = regexApp.IsMatch(splittedPRJ_NAME[1]) ? splittedPRJ_NAME[1] : $"{splittedPRJ_NAME[1]} ==> Not valid app name in .2cf file ";
+                }
+
+                
+                Regex regexVersion;
+                if (IsSpecEnabled.IsChecked == true)
+                {
+                    regexVersion = regexVersionSpecial;
+                }
+                else
+                {
+                    regexVersion = regexVersionStandard;
+                }
+                StringVer.Text = regexVersion.IsMatch(strPRJ_VERSION) ? strPRJ_VERSION : "Not valid version number in .2cf file";
+
+                // the default output folder is one level below from the src folder
+                StringDestDir.Text = System.IO.Path.GetFullPath(srcFolderPath + $"\\..");
+
+            }
+        }
+
+        private void ChooseDestDir_LeftClick(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog fileDialog = new FolderBrowserDialog();
+            fileDialog.Description = $"Seleziona la cartella di output";
+            if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                StringDestDir.Text = fileDialog.SelectedPath;
+            }
+        }
+
+        private void CheckButton_LeftClick(object sender, RoutedEventArgs e)
+        {
+            // a path was inserted in the respective field of the form
+            if (string.IsNullOrEmpty(srcFolderPath))
+            {
+                LogWrite($"Invalid source path (no path indicated in the form)");
+                return;
+            }
+
+            // check whether everything is OK to be processed
+            readyToGenerate = true;
+            if (!regexApp.IsMatch(StringApp.Text))
+            {
+                LogWrite($"Invalid app name");
+                readyToGenerate = false;
+            }
+            else
+            {
+                LogWrite($"App name ==> {StringApp.Text}");
+            }
+
+            if (IsSpecEnabled.IsChecked == true) // SPECIAL
+            {
+                if (!regexSpec.IsMatch(StringSpec.Text))
+                {
+                    LogWrite($"Invalid specialty name");
+                    readyToGenerate = false;
+                }
+                else
+                {
+                    LogWrite($"Specialty name ==> {StringSpec.Text}");
+                }
+                
+            }
+
+            if (IsSpecEnabled.IsChecked == true) // SPECIAL
+            {
+                if (!regexVersionSpecial.IsMatch(StringVer.Text))
+                {
+                    LogWrite($"Invalid special version number");
+                    readyToGenerate = false;
+                }
+                else
+                {
+                    LogWrite($"Special version number ==> {StringVer.Text}");
+                }
+            }
+            else // STANDARD
+            {
+                if (!regexVersionStandard.IsMatch(StringVer.Text))
+                {
+                    LogWrite($"Invalid standard version number");
+                    readyToGenerate = false;
+                }
+                else
+                {
+                    LogWrite($"Standard version number ==> {StringVer.Text}");
+                }
+            }
+
+            GenerateBtn.IsEnabled = readyToGenerate;
+
+            if (!readyToGenerate)
+            {
+                LogWrite($"Output cannot be generated: see Log");
+                return;
+            }
+
+            if (IsSpecEnabled.IsChecked == true) // SPECIAL
+            {
+                fullName = $"{StringApp.Text}_{StringSpec.Text}_{StringVer.Text}";
+            }
+            else
+            {
+                fullName = $"{StringApp.Text}_{StringVer.Text}";
+            }
+
+            sevenZipFileName = $"{fullName}_{sourceSuffix}.{sevenZipSuffix}";
+
+            LogWrite($"Ready to generate the archive {sevenZipFileName}");
+
+
+        }
+
+        private void AttachmentButton_LeftClick(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog fileDialog = new FolderBrowserDialog();
+            fileDialog.Description = $"Seleziona la cartella di output";
+            if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                StringAttachmentPath.Text = fileDialog.SelectedPath;
+            }
+        }
+
+        private void GenerateButton_LeftClick(object sender, RoutedEventArgs e)
+        {
+            if (!readyToGenerate)
+            {
+                LogWrite($"Generation-check not yet passed: click \"{CheckBtn.Content}\" and see Log for info");
+                return;
+            }
+            // zip archive will be saved on the output path shown in the respective field of the form
+            string destinationPath = StringDestDir.Text;
+
+            // 7zip source code 
+            LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
+
+
+            LZMAUtils.CreateArchive(srcFolderPath, destinationPath, sevenZipFileName);
+
+
+            LogWrite($"FINISHED");
+
+            // create the binaries
+            LogWrite($"Generation at the path \"{destinationPath}\" of the binaries' zip-archive named \"{fullName}_{binarySuffix}.{zipSuffix}\"");
+            PrepareTargetBinariesFolder(binTargetPLAN1ADDRESSxxxPath, StringDestDir.Text);
+
+            LogWrite($"FINISHED");
+
+            LogWrite(System.IO.Path.Combine(destinationPath, sevenZipFileName));
+
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+
+        private void IsSpecEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            StringSpec.IsEnabled = true;
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+        private void IsSpecEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            StringSpec.IsEnabled = false;
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+
+        private void LogWrite(string str)
+        {
+            StringLog.Text += $"{str} \n";
+        }
+
+        private void LogClear()
+        {
+            StringLog.Text = string.Empty;
+        }
+
+        private void PrepareTargetBinariesFolder(string targetPlanAddressxxxPath, string destinationPath)
+        {
+            // create tree of the output directory
+            string binDir = System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}");
+            Directory.CreateDirectory(binDir);
+            string otherFilesDir = System.IO.Path.Combine(binDir, $"Altri files");
+            Directory.CreateDirectory(otherFilesDir);
+
+            // look for the .2cd, .2cf, .2ct, .grp, .dev, .pvt files and copy if they exist
+            string[] otherFilesExtensions = { "2cd","2cf","2ct","grp","dev","pvt"};
+            string[] tempFiles;
+            List<string> otherFiles = new List<string>();
+            foreach (var ext in otherFilesExtensions)
+            {
+                tempFiles = Directory.GetFiles(targetPlanAddressxxxPath, $"*.{ext}");
+                if (tempFiles.Count() == 0)
+                {
+                    LogWrite($"Not found .{ext} file");
+                }
+                else
+                { 
+                    if (tempFiles.Count() > 1)
+                    {
+                        LogWrite($"Found two or more .{ext} files");
+                    }
+                    else
+                    {
+                        LogWrite($"Found exactly one .{ext} file");
+                    }   
+                    otherFiles.Add(tempFiles[0]);
+                    LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
+
+                    File.Copy(tempFiles[0], System.IO.Path.Combine(otherFilesDir, tempFiles[0].Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                }
+            }
+
+
+            // look for the .bin, .grt, .vvv, .vv2, .iup files
+            string[] itTheRootFilesExtensions = { "bin", "grt", "vvv", "vv2", "iup"};
+            List<string> inTheRootFiles = new List<string>();
+            foreach (var ext in itTheRootFilesExtensions)
+            {
+                tempFiles = Directory.GetFiles(targetPlanAddressxxxPath, $"*.{ext}");
+                if (tempFiles.Count() == 0)
+                {
+                    LogWrite($"Not found .{ext} file");
+                }
+                else
+                {
+                    if (tempFiles.Count() > 1)
+                    {
+                        LogWrite($"Found two or more .{ext} files");
+                    }
+                    else
+                    {
+                        LogWrite($"Found exactly one .{ext} file");
+                    }
+                    inTheRootFiles.Add(tempFiles[0]);
+                    LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
+
+                    File.Copy(tempFiles[0], System.IO.Path.Combine(binDir, tempFiles[0].Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                }
+            }
+
+            // copy all the files with the tree from the "File aggiuntivi" directory
+            string fileAggiuntiviDir = StringAttachmentPath.Text;
+
+            if (string.IsNullOrEmpty(fileAggiuntiviDir) || string.IsNullOrWhiteSpace(fileAggiuntiviDir))
+            {
+                LogWrite("No file aggiuntivo was indicated");
+            }
+            tempFiles = Directory.GetFiles(fileAggiuntiviDir);
+            if (tempFiles.Count() == 0)
+            {
+                LogWrite($"No file was found in the \"File aggiuntivi\" path");
+            }
+            else
+            {               
+                LogWrite($"Found exactly {tempFiles.Count()} files aggiuntivi");
+
+                foreach (var file in tempFiles)
+                {
+                    inTheRootFiles.Add(file);
+                    LogWrite($"Added \"{file}\" to directory \"Altri files\"");
+
+                    File.Copy(file, System.IO.Path.Combine(binDir, file.Substring(fileAggiuntiviDir.Length + 1)), true);
+                }
+            }
+
+            // create the .zip archive for the binaries (exclude the root)
+            ZipFile.CreateFromDirectory(binDir, System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}"), CompressionLevel.Fastest, false);
+
+            // delete the unzipped binary folder
+            Directory.Delete(binDir, true);
+
+        }
+
+        private void StringApp_LostFocus(object sender, RoutedEventArgs e)
+        {
+            StringApp.Text = regexApp.IsMatch(StringApp.Text) ? StringApp.Text : "Not valid app name";
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+        private void StringSpec_LostFocus(object sender, RoutedEventArgs e)
+        {
+            StringSpec.Text = regexApp.IsMatch(StringSpec.Text) ? StringSpec.Text : "Not valid specialty name";
+            readyToGenerate = false;
+        }
+
+        private void StringVer_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Regex regexVersion;
+            if (IsSpecEnabled.IsChecked == true)
+            {
+                regexVersion = regexVersionSpecial;
+            }
+            else
+            {
+                regexVersion = regexVersionStandard;
+            }
+
+            StringVer.Text = regexVersion.IsMatch(StringVer.Text) ? StringVer.Text : "Not valid version number";
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+    }
+
+   
+
+
+}

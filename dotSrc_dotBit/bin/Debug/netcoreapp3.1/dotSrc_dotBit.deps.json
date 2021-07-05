@@ -1,0 +1,52 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "dotSrc_dotBit/1.0.0": {
+        "dependencies": {
+          "ManagedLzma": "0.2.0-alpha-7"
+        },
+        "runtime": {
+          "dotSrc_dotBit.dll": {}
+        }
+      },
+      "ManagedLzma/0.2.0-alpha-7": {
+        "dependencies": {
+          "System.Collections.Immutable": "1.4.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/ManagedLzma.dll": {
+            "assemblyVersion": "1.0.6.0",
+            "fileVersion": "1.0.6.0"
+          }
+        }
+      },
+      "System.Collections.Immutable/1.4.0": {}
+    }
+  },
+  "libraries": {
+    "dotSrc_dotBit/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ManagedLzma/0.2.0-alpha-7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-A1xlQ8LEwOE4m8BKD4DuVuz4iD7RfcJRDVi9nXwzolZDhH7FRYk6Rh7Cmj3ZdUG+4XIWoALe5cGs/3Q+WcyK6Q==",
+      "path": "managedlzma/0.2.0-alpha-7",
+      "hashPath": "managedlzma.0.2.0-alpha-7.nupkg.sha512"
+    },
+    "System.Collections.Immutable/1.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-71hw5RUJRu5+q/geUY69gpXD8Upd12cH+F3MwpXV2zle7Bqqkrmc1JblOTuvUcgmdnUtQvBlV5e1d6RH+H2lvA==",
+      "path": "system.collections.immutable/1.4.0",
+      "hashPath": "system.collections.immutable.1.4.0.nupkg.sha512"
+    }
+  }
+}

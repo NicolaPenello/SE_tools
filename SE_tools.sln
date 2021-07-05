@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotSrc_dotBin", "dotSrc_dotBit\dotSrc_dotBin.csproj", "{326AB628-1960-4D5E-8035-F1AC8D87284F}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "dotSrc_dotBin_Setup", "dotSrc_dotBin_Setup\dotSrc_dotBin_Setup.vdproj", "{7BA29298-668E-4FEF-A94A-6CDD7C1B176B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{326AB628-1960-4D5E-8035-F1AC8D87284F}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{326AB628-1960-4D5E-8035-F1AC8D87284F}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{326AB628-1960-4D5E-8035-F1AC8D87284F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{326AB628-1960-4D5E-8035-F1AC8D87284F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA29298-668E-4FEF-A94A-6CDD7C1B176B}.Debug|Any CPU.ActiveCfg = Release
+		{7BA29298-668E-4FEF-A94A-6CDD7C1B176B}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {874EE285-6AEE-4C0B-A553-37DD763A496A}
+	EndGlobalSection
+EndGlobal
