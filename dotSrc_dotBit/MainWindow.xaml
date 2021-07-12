@@ -82,7 +82,6 @@
         <StackPanel Grid.Row="9" Grid.Column="2" Orientation="Horizontal" >
             <Button x:Name="CheckBtn" Content="Check campi" Height="20" Width="200" Grid.Row="9" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="CheckButton_LeftClick" ToolTip="Verifica se ci sono tutte le informazioni necessarie a lanciare la generazione degli archivi selezionati: se il controllo passa, allora la generazione viene abilitata"></Button>
             <Button x:Name="GenerateBtn" Content="Genera!" IsEnabled="False" Height="20" Width="200" Grid.Row="9" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="GenerateButton_LeftClick" ToolTip="Lancia la generazione degli archivi selezionati: per abilitare la generazione è prima necessario passare il check dei campi"></Button>
-            <ProgressBar x:Name="GenerationProgressBar" Minimum="0" Maximum="100" IsIndeterminate="True" Width="350" Height="20" Visibility="Hidden"></ProgressBar>
         </StackPanel>
 
         <!-- 11th row-->

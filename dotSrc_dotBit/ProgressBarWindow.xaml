@@ -1,0 +1,15 @@
+﻿<Window x:Class="dotSrc_dotBin.ProgressBarWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:dotSrc_dotBin"
+        mc:Ignorable="d"
+        Title="Sto 7zip-ando i sorgenti: questa operazione può richiedere molto tempo..." Height="100" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="None">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <TextBlock x:Name="ProgressBarLabel" Text="Sto facendo cose..." Margin="20"></TextBlock>
+            <ProgressBar x:Name="GenerationProgressBar" Minimum="0" Maximum="100" IsIndeterminate="True" Width="500" Height="20" ></ProgressBar>
+        </StackPanel>
+    </Grid>
+</Window>

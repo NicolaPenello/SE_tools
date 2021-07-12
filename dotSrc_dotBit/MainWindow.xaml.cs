@@ -1,4 +1,5 @@
 ﻿using dotSrc_dotBit.LZMA;
+using dotSrc_dotBin;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -291,7 +292,7 @@ namespace dotSrc_dotBit
             }
         }
 
-        private void GenerateButton_LeftClick(object sender, RoutedEventArgs e)
+        private async void GenerateButton_LeftClick(object sender, RoutedEventArgs e)
         {
             // this frame of code should never be executed
             if (!readyToGenerate)
@@ -303,22 +304,12 @@ namespace dotSrc_dotBit
             string destinationPath = StringDestDir.Text;
 
             // show the progress bar
-            GenerationProgressBar.Visibility = Visibility.Visible;
-
-            if (IsSrc7zipGenerationEnabled.IsChecked == true)
-            {
-                // 7zip source code 
-                LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
-
-
-                LZMAUtils.CreateArchive(srcFolderPath, destinationPath, sevenZipFileName);
-
-
-                LogWrite($"FINISHED");
-            }
+            ProgressBarWindow progressBarWindow = new ProgressBarWindow();
+            progressBarWindow.Show();
 
             if (IsBinZipGenerationEnabled.IsChecked == true)
             {
+                progressBarWindow.ProgressBarLabel.Text = $"Sto generando l'archivio .zip dei binari";
                 // create the binaries
                 LogWrite($"Generation at the path \"{destinationPath}\" of the binaries' zip-archive named \"{fullName}_{binarySuffix}.{zipSuffix}\"");
                 PrepareTargetBinariesFolder(binTargetPLAN1ADDRESSxxxPath, StringDestDir.Text);
@@ -328,11 +319,30 @@ namespace dotSrc_dotBit
                 LogWrite(System.IO.Path.Combine(destinationPath, sevenZipFileName));
             }
 
+            if (IsSrc7zipGenerationEnabled.IsChecked == true)
+            {
+                // 7zip source code 
+                LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
+
+                progressBarWindow.ProgressBarLabel.Text = $"Sto generando l'archivio .7zip dei sorgenti: l'operazione può richiedere diversi minuti";
+                // since the LZMA compressioni is lengthy, let's make it async(ronous)ly
+                await GenerateSource7zip(srcFolderPath, destinationPath, sevenZipFileName);
+                //LZMAUtils.CreateArchive(srcFolderPath, destinationPath, sevenZipFileName);
+
+                LogWrite($"FINISHED");
+            }
+
             // hide the progress bar
-            GenerationProgressBar.Visibility = Visibility.Hidden;
+            progressBarWindow.Hide();
 
             readyToGenerate = false;
             GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+        // async wrapper for LZMA compression
+        private async Task GenerateSource7zip(string srcPath, string destPath, string archivePath)
+        {
+            await Task.Run(()=> { LZMAUtils.CreateArchive(srcPath, destPath, archivePath); });           
         }
 
 
