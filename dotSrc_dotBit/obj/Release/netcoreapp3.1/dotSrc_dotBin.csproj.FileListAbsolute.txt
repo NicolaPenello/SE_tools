@@ -5,11 +5,11 @@ C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\bin\Releas
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\bin\Release\netcoreapp3.1\dotSrc_dotBin.dll
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\bin\Release\netcoreapp3.1\dotSrc_dotBin.pdb
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\bin\Release\netcoreapp3.1\ManagedLzma.dll
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.csproj.AssemblyReference.cache
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\MainWindow.baml
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\MainWindow.g.cs
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\App.g.cs
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin_MarkupCompile.cache
-C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin_MarkupCompile.lref
-C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\MainWindow.baml
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.g.resources
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.AssemblyInfoInputs.cache
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.AssemblyInfo.cs

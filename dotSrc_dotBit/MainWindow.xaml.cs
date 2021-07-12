@@ -29,7 +29,7 @@ namespace dotSrc_dotBit
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string sourceSuffix = "src";
+        private const string sourceSuffix = "src"; // unused
         private const string binarySuffix = "bin";
         private const string zipSuffix = "zip";
         private const string sevenZipSuffix = "7z";
@@ -73,7 +73,7 @@ namespace dotSrc_dotBit
                 // print in the log textbox
                 StringPath.Text = srcFolderPath;
 
-                // look for the ADDRESS_*** directory and eventually loofk for the .2cf file
+                // look for the ADDRESS_*** directory and eventually look for the .2cf file
                 string binTargetPLAN1Path = $"{srcFolderPath}\\Bin\\Target\\pLAN1";
                 
                 var arrDirectories = Directory.GetDirectories(binTargetPLAN1Path);
@@ -274,7 +274,7 @@ namespace dotSrc_dotBit
                 fullName = $"{StringApp.Text}_{StringVer.Text}";
             }
 
-            sevenZipFileName = $"{fullName}_{sourceSuffix}.{sevenZipSuffix}";
+            sevenZipFileName = $"{fullName}.{sevenZipSuffix}";
 
             LogWrite($"Ready to generate the archive {sevenZipFileName}");
 
@@ -284,7 +284,7 @@ namespace dotSrc_dotBit
         private void AttachmentButton_LeftClick(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog fileDialog = new FolderBrowserDialog();
-            fileDialog.Description = $"Seleziona la cartella di output";
+            fileDialog.Description = $"Seleziona la cartella dei file aggiuntivi";
             if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 StringAttachmentPath.Text = fileDialog.SelectedPath;
@@ -293,6 +293,7 @@ namespace dotSrc_dotBit
 
         private void GenerateButton_LeftClick(object sender, RoutedEventArgs e)
         {
+            // this frame of code should never be executed
             if (!readyToGenerate)
             {
                 LogWrite($"Generation-check not yet passed: click \"{CheckBtn.Content}\" and see Log for info");
@@ -301,22 +302,34 @@ namespace dotSrc_dotBit
             // zip archive will be saved on the output path shown in the respective field of the form
             string destinationPath = StringDestDir.Text;
 
-            // 7zip source code 
-            LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
+            // show the progress bar
+            GenerationProgressBar.Visibility = Visibility.Visible;
+
+            if (IsSrc7zipGenerationEnabled.IsChecked == true)
+            {
+                // 7zip source code 
+                LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
 
 
-            LZMAUtils.CreateArchive(srcFolderPath, destinationPath, sevenZipFileName);
+                LZMAUtils.CreateArchive(srcFolderPath, destinationPath, sevenZipFileName);
 
 
-            LogWrite($"FINISHED");
+                LogWrite($"FINISHED");
+            }
 
-            // create the binaries
-            LogWrite($"Generation at the path \"{destinationPath}\" of the binaries' zip-archive named \"{fullName}_{binarySuffix}.{zipSuffix}\"");
-            PrepareTargetBinariesFolder(binTargetPLAN1ADDRESSxxxPath, StringDestDir.Text);
+            if (IsBinZipGenerationEnabled.IsChecked == true)
+            {
+                // create the binaries
+                LogWrite($"Generation at the path \"{destinationPath}\" of the binaries' zip-archive named \"{fullName}_{binarySuffix}.{zipSuffix}\"");
+                PrepareTargetBinariesFolder(binTargetPLAN1ADDRESSxxxPath, StringDestDir.Text);
 
-            LogWrite($"FINISHED");
+                LogWrite($"FINISHED");
 
-            LogWrite(System.IO.Path.Combine(destinationPath, sevenZipFileName));
+                LogWrite(System.IO.Path.Combine(destinationPath, sevenZipFileName));
+            }
+
+            // hide the progress bar
+            GenerationProgressBar.Visibility = Visibility.Hidden;
 
             readyToGenerate = false;
             GenerateBtn.IsEnabled = readyToGenerate;
@@ -336,6 +349,27 @@ namespace dotSrc_dotBit
             readyToGenerate = false;
             GenerateBtn.IsEnabled = readyToGenerate;
         }
+
+        private void IsSrc7zipGenerationEnabled_Checked(object sender, RoutedEventArgs e)
+        { 
+            //
+        }
+
+        private void IsSrc7zipGenerationEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            //
+        }
+
+        private void IsBinZipGenerationEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            //
+        }
+
+        private void IsBinZipGenerationEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            //
+        }
+
 
 
         private void LogWrite(string str)
@@ -376,11 +410,25 @@ namespace dotSrc_dotBit
                     else
                     {
                         LogWrite($"Found exactly one .{ext} file");
-                    }   
-                    otherFiles.Add(tempFiles[0]);
-                    LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
+                    }
+                    if (ext == $"pvt") // there may be multiple .pvt files: copy them all
+                    {
+                        foreach (var pvtFile in tempFiles)
+                        {
+                            otherFiles.Add(pvtFile);
+                            LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
 
-                    File.Copy(tempFiles[0], System.IO.Path.Combine(otherFilesDir, tempFiles[0].Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                            File.Copy(pvtFile, System.IO.Path.Combine(otherFilesDir, pvtFile.Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                        }
+                    }
+                    else // in any other case there should be one file per extension: so just copy the first one
+                    {
+                        otherFiles.Add(tempFiles[0]);
+                        LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
+
+                        File.Copy(tempFiles[0], System.IO.Path.Combine(otherFilesDir, tempFiles[0].Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                    }
+                    
                 }
             }
 
@@ -405,35 +453,51 @@ namespace dotSrc_dotBit
                     {
                         LogWrite($"Found exactly one .{ext} file");
                     }
-                    inTheRootFiles.Add(tempFiles[0]);
-                    LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
+                    if (ext == $"iup") // there may be multiple .iup files: copy them all
+                    {
+                        foreach (var iupFile in tempFiles)
+                        {
+                            inTheRootFiles.Add(iupFile);
+                            LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
 
-                    File.Copy(tempFiles[0], System.IO.Path.Combine(binDir, tempFiles[0].Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                            File.Copy(iupFile, System.IO.Path.Combine(binDir, iupFile.Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                        }
+                    }
+                    else // in any other case there should be one file per extension: so just copy the first one
+                    {
+                        inTheRootFiles.Add(tempFiles[0]);
+                        LogWrite($"Added \"{tempFiles[0]}\" to directory \"Altri files\"");
+
+                        File.Copy(tempFiles[0], System.IO.Path.Combine(binDir, tempFiles[0].Substring(targetPlanAddressxxxPath.Length + 1)), true);
+                    }
                 }
             }
 
             // copy all the files with the tree from the "File aggiuntivi" directory
             string fileAggiuntiviDir = StringAttachmentPath.Text;
 
-            if (string.IsNullOrEmpty(fileAggiuntiviDir) || string.IsNullOrWhiteSpace(fileAggiuntiviDir))
+            if (string.IsNullOrEmpty(fileAggiuntiviDir) || string.IsNullOrWhiteSpace(fileAggiuntiviDir)) // if no attachments directory was indicated, just warn me
             {
                 LogWrite("No file aggiuntivo was indicated");
             }
-            tempFiles = Directory.GetFiles(fileAggiuntiviDir);
-            if (tempFiles.Count() == 0)
+            else // instead if the attachments directory was indicated, then copy the files
             {
-                LogWrite($"No file was found in the \"File aggiuntivi\" path");
-            }
-            else
-            {               
-                LogWrite($"Found exactly {tempFiles.Count()} files aggiuntivi");
-
-                foreach (var file in tempFiles)
+                tempFiles = Directory.GetFiles(fileAggiuntiviDir);
+                if (tempFiles.Count() == 0)
                 {
-                    inTheRootFiles.Add(file);
-                    LogWrite($"Added \"{file}\" to directory \"Altri files\"");
+                    LogWrite($"No file was found in the \"File aggiuntivi\" path");
+                }
+                else
+                {               
+                    LogWrite($"Found exactly {tempFiles.Count()} files aggiuntivi");
 
-                    File.Copy(file, System.IO.Path.Combine(binDir, file.Substring(fileAggiuntiviDir.Length + 1)), true);
+                    foreach (var file in tempFiles)
+                    {
+                        inTheRootFiles.Add(file);
+                        LogWrite($"Added \"{file}\" to directory \"Altri files\"");
+
+                        File.Copy(file, System.IO.Path.Combine(binDir, file.Substring(fileAggiuntiviDir.Length + 1)), true);
+                    }
                 }
             }
 

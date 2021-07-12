@@ -1,9 +1,8 @@
 ﻿<Window x:Class="dotSrc_dotBit.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:dotSrc_dotBit"
         mc:Ignorable="d"
         Title="Src+Bin tool" Height="500" Width="1200">
 
@@ -23,26 +22,27 @@
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
             <RowDefinition MinHeight="200" Height="*"></RowDefinition>
 
 
         </Grid.RowDefinitions>
 
         <!-- 1st row-->
-        <TextBlock  x:Name="LabelApp" Text="Nome applicazione" Grid.Row="0" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-        <TextBox x:Name="StringApp" Text="nomeApp" Grid.Row="0" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="980" MaxLength="30" LostFocus="StringApp_LostFocus"/>
+        <TextBlock  x:Name="LabelApp" Text="Nome applicazione" Grid.Row="0" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Nome applicazione: ammette solo caratteri alfanumerici (e.g. AQUACENTR, closecdz, pippo32PLUTO, ...)"></TextBlock>
+        <TextBox x:Name="StringApp" Text="nomeApp" Grid.Row="0" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="750" MaxLength="30" LostFocus="StringApp_LostFocus"/>
 
         <!-- 2nd row-->
-        <CheckBox  x:Name="IsSpecEnabled" Grid.Row="1" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsSpecEnabled_Checked" Unchecked="IsSpecEnabled_Unchecked"></CheckBox>
-        <TextBlock x:Name="LabelSpec" Text="Codice specialità" Grid.Row="1" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-        <TextBox x:Name="StringSpec" Text="codSpec" Grid.Row="1" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="980" MaxLength="10" IsEnabled="False" LostFocus="StringSpec_LostFocus"/>
+        <CheckBox  x:Name="IsSpecEnabled" Grid.Row="1" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsSpecEnabled_Checked" Unchecked="IsSpecEnabled_Unchecked" ToolTip="Modalità STD-ETO: spuntare la casella per passare alla modalità ETO"></CheckBox>
+        <TextBlock x:Name="LabelSpec" Text="Codice specialità" Grid.Row="1" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Codice specialità: ammette solo caratteri alfanumerici (e.g. 3PSUPS, HL, ...)"></TextBlock>
+        <TextBox x:Name="StringSpec" Text="codSpec" Grid.Row="1" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="750" MaxLength="10" IsEnabled="False" LostFocus="StringSpec_LostFocus"/>
 
         <!-- 3rd row-->
-        <TextBlock x:Name="LabelVer" Text="Versione" Grid.Row="2" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="LabelVer" Text="Versione" Grid.Row="2" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Versione (in base alla modalità): STD => x.y o x.yy; ETO => x.y.zzz o x.yy.zzz"></TextBlock>
         <TextBox x:Name="StringVer" Text="ver" Grid.Row="2" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Width="400" MaxLength="10" LostFocus="StringVer_LostFocus"></TextBox>
 
         <!-- 4th row-->
-        <TextBlock x:Name="LabelPath" Text="Path del progetto" Grid.Row="3" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="LabelPath" Text="Path del progetto" Grid.Row="3" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Path del file .ots della soluzione: esplorando l'alberatura di default delle soluzioni 1tool, l'app cercherà di popolare automaticamente (tenendo conto della modolità STD o ETO) i campi app, specialità e versione"></TextBlock>
         <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2">
             <Button x:Name="ChooseOtsBtn" Content="Scegli soluzione" Height="20" Width="200" Grid.Row="3" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="ChooseOtsButton_LeftClick" ></Button>
             <TextBox x:Name="StringPath" Text="path"  Grid.Row="3" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="550"></TextBox>
@@ -51,7 +51,7 @@
 
         <!-- 5th row-->
         <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal" >
-            <Button x:Name="AttachmentBtn" Content="Cartella file aggiuntivi" Height="20" Width="200" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="AttachmentButton_LeftClick" ></Button>
+            <Button x:Name="AttachmentBtn" Content="Cartella file aggiuntivi" Height="20" Width="200" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="AttachmentButton_LeftClick" ToolTip="Tutti i file contenuti nella directory indicata verranno allegati alla radice del file .zip dei binari. IMPORTANTE: la directory selezionata deve contenere solo files e nessuna sub-directory"></Button>
             <TextBox x:Name="StringAttachmentPath" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="550"></TextBox>
         </StackPanel>
 
@@ -59,7 +59,7 @@
         <!-- empty row -->
 
         <!-- 7th row-->
-        <TextBlock x:Name="LabelDestDir" Text="Path dell'output" Grid.Row="6" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="LabelDestDir" Text="Path dell'output" Grid.Row="6" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Indica la directory in cui verranno inseriti gli archivi .7z e .zip creati"></TextBlock>
         <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="2">
             <Button x:Name="ChooseDestDir" Content="Scegli destinazione" Height="20" Width="200" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="ChooseDestDir_LeftClick" ></Button>
             <TextBox x:Name="StringDestDir" Text="path" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="550"></TextBox>
@@ -70,14 +70,24 @@
         <!-- empty row -->
 
         <!-- 9th row-->
+        <TextBlock x:Name="LabelGenerationInfo" Text="Elementi da generare" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Indica la directory in cui verranno inseriti gli archivi .7z e .zip creati"></TextBlock>
         <StackPanel Grid.Row="8" Grid.Column="2" Orientation="Horizontal" >
-            <Button x:Name="CheckBtn" Content="Check campi" Height="20" Width="200" Grid.Row="8" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="CheckButton_LeftClick" ></Button>
-            <Button x:Name="GenerateBtn" Content="Genera!"  IsEnabled="False" Height="20" Width="200" Grid.Row="8" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="GenerateButton_LeftClick" ></Button>
+            <CheckBox  x:Name="IsSrc7zipGenerationEnabled" Grid.Row="8" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsSrc7zipGenerationEnabled_Checked" Unchecked="IsSrc7zipGenerationEnabled_Unchecked" ToolTip="Spuntare la casella per generare l'archivio 7zip dei sorgenti"></CheckBox>
+            <TextBlock x:Name="LabelSrc7zipGeneration" Text="archivio 7 zip dei sorgenti" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,50,0"></TextBlock>
+            <CheckBox  x:Name="IsBinZipGenerationEnabled" Grid.Row="8" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsBinZipGenerationEnabled_Checked" Unchecked="IsBinZipGenerationEnabled_Unchecked" ToolTip="Spuntare la casella per generare l'archivio zip dei binari"></CheckBox>
+            <TextBlock x:Name="LabelBinZipGeneration" Text="archivio zip dei binari" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        </StackPanel>
+        
+        <!-- 10th row-->
+        <StackPanel Grid.Row="9" Grid.Column="2" Orientation="Horizontal" >
+            <Button x:Name="CheckBtn" Content="Check campi" Height="20" Width="200" Grid.Row="9" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="CheckButton_LeftClick" ToolTip="Verifica se ci sono tutte le informazioni necessarie a lanciare la generazione degli archivi selezionati: se il controllo passa, allora la generazione viene abilitata"></Button>
+            <Button x:Name="GenerateBtn" Content="Genera!" IsEnabled="False" Height="20" Width="200" Grid.Row="9" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Click="GenerateButton_LeftClick" ToolTip="Lancia la generazione degli archivi selezionati: per abilitare la generazione è prima necessario passare il check dei campi"></Button>
+            <ProgressBar x:Name="GenerationProgressBar" Minimum="0" Maximum="100" IsIndeterminate="True" Width="350" Height="20" Visibility="Hidden"></ProgressBar>
         </StackPanel>
 
-        <!-- 10th row-->
-        <TextBlock x:Name="Log" Text="Log" Grid.Row="9" Grid.Column="1" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Center"></TextBlock>
-        <TextBox x:Name="StringLog" Text=""  Grid.Row="9" Grid.Column="2" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Left" MinWidth="980" MinHeight="190" IsReadOnly="True" TextWrapping="Wrap"></TextBox>
+        <!-- 11th row-->
+        <TextBlock x:Name="Log" Text="Log" Grid.Row="10" Grid.Column="1" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Center" ToolTip="Informazioni sullo stato dell'applicazione"></TextBlock>
+        <TextBox x:Name="StringLog" Text=""  Grid.Row="10" Grid.Column="2" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Left" MinWidth="750" MinHeight="150" MaxHeight="450" IsReadOnly="True" TextWrapping="Wrap"></TextBox>
 
     </Grid>
 </Window>
