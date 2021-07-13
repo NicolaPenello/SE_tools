@@ -40,7 +40,7 @@ namespace dotSrc_dotBit
         private const string PRJ_NAME = "PRJ_NAME";
         private const string PRJ_VERSION = "PRJ_VERSION";
 
-        private string fullName;            // STD =>  [app]_[verSTD]; ETO => [app]_[spec]_[verETO]
+        private string fullName;            // STD =>  [app]_[verSTD]; ETO => [app]_[spec]_[verETO]; in case of redundancy: [fullname]_[datetime]
         private string sevenZipFileName;    // [fullname]_src.7z        
         private string srcFolderPath;       // 
         private string binTargetPLAN1ADDRESSxxxPath;
@@ -307,9 +307,19 @@ namespace dotSrc_dotBit
             ProgressBarWindow progressBarWindow = new ProgressBarWindow();
             progressBarWindow.Show();
 
+            // binaries' archive
             if (IsBinZipGenerationEnabled.IsChecked == true)
             {
                 progressBarWindow.ProgressBarLabel.Text = $"Sto generando l'archivio .zip dei binari";
+
+                // check if a file with the same name already exists: in this case append date and hour to the name of the archive
+                if (File.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}")) ||
+                    Directory.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}")))
+                {
+                    fullName += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}";
+                    // fullName += $"{System.DateTime.Now.Day}{System.DateTime.Now.Month}{System.DateTime.Now.Year}_{System.DateTime.Now.Hour}{System.DateTime.Now.Minute}{System.DateTime.Now.Second}";
+                }
+
                 // create the binaries
                 LogWrite($"Generation at the path \"{destinationPath}\" of the binaries' zip-archive named \"{fullName}_{binarySuffix}.{zipSuffix}\"");
                 PrepareTargetBinariesFolder(binTargetPLAN1ADDRESSxxxPath, StringDestDir.Text);
@@ -319,9 +329,15 @@ namespace dotSrc_dotBit
                 LogWrite(System.IO.Path.Combine(destinationPath, sevenZipFileName));
             }
 
+            // 7zip source code 
             if (IsSrc7zipGenerationEnabled.IsChecked == true)
             {
-                // 7zip source code 
+                // check if a file with the same name already exists: in this case append date and hour to the name of the archive
+                if (File.Exists(System.IO.Path.Combine(destinationPath, $"{sevenZipFileName}.{sevenZipSuffix}")))
+                {
+                    sevenZipFileName += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}"; ;
+                }
+
                 LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
 
                 progressBarWindow.ProgressBarLabel.Text = $"Sto generando l'archivio .7zip dei sorgenti: l'operazione può richiedere diversi minuti";
@@ -344,7 +360,6 @@ namespace dotSrc_dotBit
         {
             await Task.Run(()=> { LZMAUtils.CreateArchive(srcPath, destPath, archivePath); });           
         }
-
 
         private void IsSpecEnabled_Checked(object sender, RoutedEventArgs e)
         {
@@ -512,7 +527,7 @@ namespace dotSrc_dotBit
             }
 
             // create the .zip archive for the binaries (exclude the root)
-            ZipFile.CreateFromDirectory(binDir, System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}"), CompressionLevel.Fastest, false);
+            ZipFile.CreateFromDirectory(binDir, System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}"), CompressionLevel.Optimal, false);
 
             // delete the unzipped binary folder
             Directory.Delete(binDir, true);
