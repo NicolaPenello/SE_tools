@@ -30,6 +30,8 @@ namespace dotSrc_dotBit
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string _VERSION_ = "1.0.0";
+
         private const string sourceSuffix = "src"; // unused
         private const string binarySuffix = "bin";
         private const string zipSuffix = "zip";
@@ -57,6 +59,7 @@ namespace dotSrc_dotBit
         public MainWindow()
         {
             InitializeComponent();
+            this.Title += $" - {_VERSION_}";
             IsSpecEnabled.IsChecked = false;
         }
 
