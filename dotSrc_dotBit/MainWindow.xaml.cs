@@ -51,8 +51,9 @@ namespace dotSrc_dotBit
         private Regex regexSpec = new Regex(@"^[a-zA-Z0-9]*$");
         private Regex regexVersionSpecial = new Regex(@"^[1-9]\.[0-9]\d{0,1}\.[0-9][0-9][0-9]$");
         private Regex regexVersionStandard = new Regex(@"^[1-9]\.[0-9]\d{0,1}$");
-      
-        
+        private Regex regexVersionObsolete = new Regex(@"^[1-9]\.[0-9]\d{0,1}$");
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -172,15 +173,35 @@ namespace dotSrc_dotBit
 
                 
                 Regex regexVersion;
-                if (IsSpecEnabled.IsChecked == true)
+                if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == false) // SPECIAL
                 {
-                    regexVersion = regexVersionSpecial;
+                    regexVersion = regexVersionSpecial;                  
                 }
-                else
+                else if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == true) // OBSOLETE-ETO
+                {
+                    regexVersion = regexVersionObsolete;
+                }
+                else // STANDARD
                 {
                     regexVersion = regexVersionStandard;
                 }
-                StringVer.Text = regexVersion.IsMatch(strPRJ_VERSION) ? strPRJ_VERSION : "Not valid version number in .2cf file";
+
+                // only for special version, try first to "reconstruct" a valid 
+                string[] splitted_PRJ_VERSION;
+                if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == false) // SPECIAL
+                {
+                    // check if the version is in the style x.y(y).(zz)z and in that case left-pad with zeroes the right-most field
+                    if ( (new Regex(@"^[1-9]\.[0-9]\d{0,1}\.[0-9]\d{0,2}$")).IsMatch(strPRJ_VERSION) )
+                    {
+                        splitted_PRJ_VERSION = strPRJ_VERSION.Split('.');
+                        splitted_PRJ_VERSION[2] = splitted_PRJ_VERSION[2].PadLeft(3,'0'); // padding
+
+                        // overwrite the version to be processed
+                        strPRJ_VERSION = string.Join(".", splitted_PRJ_VERSION);
+                    }
+                }
+
+                StringVer.Text = regexVersion.IsMatch(strPRJ_VERSION) ? strPRJ_VERSION : "Not valid version number in .2cf file";     
 
                 // the default output folder is one level below from the src folder
                 StringDestDir.Text = System.IO.Path.GetFullPath(srcFolderPath + $"\\..");
@@ -233,11 +254,23 @@ namespace dotSrc_dotBit
                 
             }
 
-            if (IsSpecEnabled.IsChecked == true) // SPECIAL
+            if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == false) // SPECIAL
             {
                 if (!regexVersionSpecial.IsMatch(StringVer.Text))
                 {
                     LogWrite($"Invalid special version number");
+                    readyToGenerate = false;
+                }
+                else
+                {
+                    LogWrite($"Special version number ==> {StringVer.Text}");
+                }
+            }
+            else if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == false) // OBSOLETE-ETO
+            {
+                if (!regexVersionObsolete.IsMatch(StringVer.Text))
+                {
+                    LogWrite($"Invalid obsolete-special version number");
                     readyToGenerate = false;
                 }
                 else
@@ -364,6 +397,8 @@ namespace dotSrc_dotBit
         private void IsSpecEnabled_Checked(object sender, RoutedEventArgs e)
         {
             StringSpec.IsEnabled = true;
+            IsObsoleteEnabled.IsEnabled = true;
+            ModeLabel.Text = "ETO mode";
             readyToGenerate = false;
             GenerateBtn.IsEnabled = readyToGenerate;
         }
@@ -371,6 +406,23 @@ namespace dotSrc_dotBit
         private void IsSpecEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             StringSpec.IsEnabled = false;
+            IsObsoleteEnabled.IsEnabled = false;
+            IsObsoleteEnabled.IsChecked = false;
+            ModeLabel.Text = "STANDARD mode";
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+        private void IsObsoleteEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            ModeLabel.Text = "OBSOLETE-ETO mode";
+            readyToGenerate = false;
+            GenerateBtn.IsEnabled = readyToGenerate;
+        }
+
+        private void IsObsoleteEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ModeLabel.Text = "ETO mode";
             readyToGenerate = false;
             GenerateBtn.IsEnabled = readyToGenerate;
         }
@@ -550,11 +602,15 @@ namespace dotSrc_dotBit
         private void StringVer_LostFocus(object sender, RoutedEventArgs e)
         {
             Regex regexVersion;
-            if (IsSpecEnabled.IsChecked == true)
+            if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == false) // SPECIAL
             {
                 regexVersion = regexVersionSpecial;
             }
-            else
+            else if (IsSpecEnabled.IsChecked == true && IsObsoleteEnabled.IsChecked == true) // OBSOLETE-ETO
+            {
+                regexVersion = regexVersionObsolete;
+            }
+            else // STANDARD
             {
                 regexVersion = regexVersionStandard;
             }

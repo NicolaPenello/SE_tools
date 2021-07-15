@@ -38,8 +38,12 @@
         <TextBox x:Name="StringSpec" Text="codSpec" Grid.Row="1" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" MinWidth="750" MaxLength="10" IsEnabled="False" LostFocus="StringSpec_LostFocus"/>
 
         <!-- 3rd row-->
+        <CheckBox  x:Name="IsObsoleteEnabled" Grid.Row="2" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsObsoleteEnabled_Checked" Unchecked="IsObsoleteEnabled_Unchecked" ToolTip="Versione OBSOLETE: spuntare la casella per passare alla modalità ETO-OBSOLETE"></CheckBox>
         <TextBlock x:Name="LabelVer" Text="Versione" Grid.Row="2" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Versione (in base alla modalità): STD => x.y o x.yy; ETO => x.y.zzz o x.yy.zzz"></TextBlock>
-        <TextBox x:Name="StringVer" Text="ver" Grid.Row="2" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Width="400" MaxLength="10" LostFocus="StringVer_LostFocus"></TextBox>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center">
+            <TextBox x:Name="StringVer" Text="ver" Grid.Row="2" Grid.Column="2" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" Width="400" MaxLength="10" LostFocus="StringVer_LostFocus"></TextBox>
+            <TextBlock x:Name="ModeLabel" Text="STANDARD mode" Grid.Row="2" Grid.Column="2"  Margin="100,0,0,0"></TextBlock>
+        </StackPanel>
 
         <!-- 4th row-->
         <TextBlock x:Name="LabelPath" Text="Path del progetto" Grid.Row="3" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Path del file .ots della soluzione: esplorando l'alberatura di default delle soluzioni 1tool, l'app cercherà di popolare automaticamente (tenendo conto della modolità STD o ETO) i campi app, specialità e versione"></TextBlock>
