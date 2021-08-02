@@ -30,7 +30,7 @@ namespace dotSrc_dotBit
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _VERSION_ = "1.0.0";
+        private const string _VERSION_ = "1.0.1";
 
         private const string sourceSuffix = "src"; // unused
         private const string binarySuffix = "bin";
@@ -80,6 +80,13 @@ namespace dotSrc_dotBit
 
                 // look for the ADDRESS_*** directory and eventually look for the .2cf file
                 string binTargetPLAN1Path = $"{srcFolderPath}\\Bin\\Target\\pLAN1";
+
+                // first of all check for the pLAN1 folder: if it doesn't exist then abort
+                if (!Directory.Exists(binTargetPLAN1Path))
+                {
+                    LogWrite($"Directory {binTargetPLAN1Path} was not found: process aborted. Check for problems in the file-tree of the solution folder");
+                    return;
+                }
                 
                 var arrDirectories = Directory.GetDirectories(binTargetPLAN1Path);
 
@@ -201,6 +208,17 @@ namespace dotSrc_dotBit
 
                         // overwrite the version to be processed
                         strPRJ_VERSION = string.Join(".", splitted_PRJ_VERSION);
+                    }
+                }
+                else // for the standard and obsolete-eto, ignore the rightmost field if it is zero-valued
+                {
+                    // check if the version is in the style x.y(y).0 and in that case ignore the right-most field
+                    if ((new Regex(@"^[1-9]\.[0-9]\d{0,1}\.0$")).IsMatch(strPRJ_VERSION))
+                    {
+                        splitted_PRJ_VERSION = strPRJ_VERSION.Split('.');
+
+                        // overwrite the version to be processed
+                        strPRJ_VERSION = $"{splitted_PRJ_VERSION[0]}.{splitted_PRJ_VERSION[1]}";
                     }
                 }
 
