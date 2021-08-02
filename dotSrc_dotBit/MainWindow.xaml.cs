@@ -30,7 +30,7 @@ namespace dotSrc_dotBit
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _VERSION_ = "1.0.1";
+        private const string _VERSION_ = "1.0.2";
 
         private const string sourceSuffix = "src"; // unused
         private const string binarySuffix = "bin";
@@ -370,8 +370,26 @@ namespace dotSrc_dotBit
                 if (File.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}")) ||
                     Directory.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}")))
                 {
-                    fullName += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}";
-                    // fullName += $"{System.DateTime.Now.Day}{System.DateTime.Now.Month}{System.DateTime.Now.Year}_{System.DateTime.Now.Hour}{System.DateTime.Now.Minute}{System.DateTime.Now.Second}";
+                    string caption = "Archivio .zip dei binari già esistente";
+                    string msg = $"Sovrascrivere il file {System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}")}?\nCliccando No, all'archivio verranno accodate data e ora di creazione. ";
+                    MessageBoxResult binDialogResult = System.Windows.MessageBox.Show(msg, caption, MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+                    // if the overwriting was chosen, then delete the old files or directories
+                    if (binDialogResult == MessageBoxResult.Yes)
+                    {
+                        if (File.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}")))
+                        {
+                            File.Delete(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}.{zipSuffix}"));
+                        }
+                        if (Directory.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}")))
+                        {
+                            Directory.Delete(System.IO.Path.Combine(destinationPath, $"{fullName}_{binarySuffix}"));
+                        }
+                    }
+                    if (binDialogResult == MessageBoxResult.No)
+                    {
+                        fullName += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}";
+                        // fullName += $"{System.DateTime.Now.Day}{System.DateTime.Now.Month}{System.DateTime.Now.Year}_{System.DateTime.Now.Hour}{System.DateTime.Now.Minute}{System.DateTime.Now.Second}";
+                    }
                 }
 
                 // create the binaries
@@ -380,16 +398,28 @@ namespace dotSrc_dotBit
 
                 LogWrite($"FINISHED");
 
-                LogWrite(System.IO.Path.Combine(destinationPath, sevenZipFileName));
             }
 
             // 7zip source code 
             if (IsSrc7zipGenerationEnabled.IsChecked == true)
             {
                 // check if a file with the same name already exists: in this case append date and hour to the name of the archive
-                if (File.Exists(System.IO.Path.Combine(destinationPath, $"{sevenZipFileName}.{sevenZipSuffix}")))
+                if (File.Exists(System.IO.Path.Combine(destinationPath, $"{sevenZipFileName}")))
                 {
-                    sevenZipFileName += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}"; ;
+                    string caption = "Archivio sorgenti .7zip già esistente";
+                    string msg = $"Sovrascrivere il file {System.IO.Path.Combine(destinationPath, $"{sevenZipFileName}")}?\nCliccando No, all'archivio verranno accodate data e ora di creazione. ";
+                    MessageBoxResult srcDialogResult = System.Windows.MessageBox.Show(msg, caption, MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+                    // if the overwriting was chosen, then delete the old files or directories
+                    if (srcDialogResult == MessageBoxResult.Yes)
+                    {
+                        File.Delete(System.IO.Path.Combine(destinationPath, $"{sevenZipFileName}"));
+                    }
+                    if (srcDialogResult == MessageBoxResult.No)
+                    {
+                        string[] splittedSevenZipFileName = sevenZipFileName.Split('.');
+                        splittedSevenZipFileName[splittedSevenZipFileName.Length-2] += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}";
+                        sevenZipFileName = string.Join('.', splittedSevenZipFileName);
+                    }
                 }
 
                 LogWrite($"Generation at the path \"{destinationPath}\" of the source's 7zip-archive named \"{sevenZipFileName}\" of the directory \"{srcFolderPath}\"");
@@ -592,7 +622,7 @@ namespace dotSrc_dotBit
                     foreach (var file in tempFiles)
                     {
                         inTheRootFiles.Add(file);
-                        LogWrite($"Added \"{file}\" to directory \"Altri files\"");
+                        LogWrite($"Added file aggiuntivo \"{file}\"");
 
                         File.Copy(file, System.IO.Path.Combine(binDir, file.Substring(fileAggiuntiviDir.Length + 1)), true);
                     }
