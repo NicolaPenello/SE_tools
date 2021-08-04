@@ -1,0 +1,11 @@
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\dotSrc_dotBin.exe
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\PrepareEtoTool.exe
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\dotSrc_dotBin.deps.json
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\dotSrc_dotBin.runtimeconfig.json
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\PrepareEtoTool.dll
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\PrepareEtoTool.deps.json
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\PrepareEtoTool.runtimeconfig.json
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\PrepareEtoTool.pdb
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\ManagedLzma.dll
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\dotSrc_dotBin.dll
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\PrepareEtoTool\bin\Release\netcoreapp3.1\publish\dotSrc_dotBin.pdb
