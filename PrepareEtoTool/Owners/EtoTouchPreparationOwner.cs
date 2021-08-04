@@ -259,6 +259,8 @@ namespace Owners
                 LogWrite($"Directory {Path.Combine(RootPath, EtoStrings.APP_DIR, EtoStrings.MAKEFILE)} doesn't exist");
                 return;
             }
+
+
             var process = new Process();
 
             var startInfo = new ProcessStartInfo
@@ -276,18 +278,19 @@ namespace Owners
 
             // clean
             process.StandardInput.WriteLine($"{CommandLineCommands.NMAKE} {CommandLineCommands.CLEAN}");
+            LogWrite($"Command {CommandLineCommands.NMAKE} {CommandLineCommands.CLEAN} launched");
 
             string appLangCommand;
             string appLpkCommand;
 
             switch (EtoStrings.ToEnum(appName))
             {
-                case EtoProjects.AMICO:     appLangCommand = "amicolang";       appLpkCommand = "amicolpk";     break;
-                case EtoProjects.BCWC:      appLangCommand = "aquacentrlang";   appLpkCommand = "aquacentrlpk"; break;
-                case EtoProjects.LEOGEN2:   appLangCommand = "leogen2lang";     appLpkCommand = "leogen2lpk";   break;
-                case EtoProjects.TRMCHLR:   appLangCommand = "trmchlrlang";     appLpkCommand = "trmchlrlpk";   break;
-                case EtoProjects.UNFLRLE_L: appLangCommand = "unflrlellang";    appLpkCommand = "unflrlellpk";  break;
-                case EtoProjects.UNFLRTSA:  appLangCommand = "unflrtsalang";    appLpkCommand = "unflrtsalpk";  break;
+                case EtoProjects.AMICO: appLangCommand = "amicolang"; appLpkCommand = "amicolpk"; break;
+                case EtoProjects.BCWC: appLangCommand = "aquacentrlang"; appLpkCommand = "aquacentrlpk"; break;
+                case EtoProjects.LEOGEN2: appLangCommand = "leogen2lang"; appLpkCommand = "leogen2lpk"; break;
+                case EtoProjects.TRMCHLR: appLangCommand = "trmchlrlang"; appLpkCommand = "trmchlrlpk"; break;
+                case EtoProjects.UNFLRLE_L: appLangCommand = "unflrlellang"; appLpkCommand = "unflrlellpk"; break;
+                case EtoProjects.UNFLRTSA: appLangCommand = "unflrtsalang"; appLpkCommand = "unflrtsalpk"; break;
                 default:
                     throw new Exception();
             }
@@ -296,11 +299,16 @@ namespace Owners
 
             // lang
             process.StandardInput.WriteLine($"{CommandLineCommands.NMAKE} {appLangCommand}");
+            LogWrite($"Command {CommandLineCommands.NMAKE} {appLangCommand} launched");
 
             // lpk
             process.StandardInput.WriteLine($"{CommandLineCommands.NMAKE} {appLpkCommand}");
+            LogWrite($"Command {CommandLineCommands.NMAKE} {appLpkCommand} launched");
 
-            process.Close();
+            process.WaitForExit();
+
+
+            LogWrite($"Prompt exited");
 
         }
 

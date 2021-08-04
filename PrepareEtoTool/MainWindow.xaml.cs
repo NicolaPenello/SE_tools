@@ -124,6 +124,18 @@ namespace PrepareEtoTool
             string appBranch = StringBranch.Text;
             string appVersion = StringVer.Text;
 
+            // message box to warn the user about the app in the PhraseDb
+            string msg = $"Prima di lanciare la modifica è necessario che sia stata creata l'app \"{appName}_{appBranch}\" in PhraseDB.\nE' già stata creata?";
+            string caption = $"Creazione app in PhraseDB";
+            MessageBoxResult phraseDbWarningResult = System.Windows.MessageBox.Show(msg, caption, MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+            if (phraseDbWarningResult == MessageBoxResult.No)
+            {
+                LogWrite($"Update aborted by the user: app {appName}_{appBranch} not present in PhraseDB");
+                return;
+            }
+            LogWrite($"Update confirmed by the user: app {appName}_{appBranch} present in PhraseDB");
+
+
             EtoTouchPreparationOwner owner = new EtoTouchPreparationOwner(rootPath);
             owner.UpdateHeaderC(appName, appBranch, appVersion);
             owner.UpdateMakefile(appName, appBranch, appVersion);
