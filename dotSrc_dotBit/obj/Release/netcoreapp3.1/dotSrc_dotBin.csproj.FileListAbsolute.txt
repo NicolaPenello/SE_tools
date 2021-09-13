@@ -20,3 +20,7 @@ C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Releas
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.dll
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.pdb
 C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.genruntimeconfig.cache
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.csproj.AssemblyReference.cache
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\obj\Release\netcoreapp3.1\dotSrc_dotBin.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\bin\Release\netcoreapp3.1\CRC\crc.bat
+C:\Users\sesa556056\source\repos\NicolaPenello\SE_tools\dotSrc_dotBit\bin\Release\netcoreapp3.1\CRC\CRC.exe

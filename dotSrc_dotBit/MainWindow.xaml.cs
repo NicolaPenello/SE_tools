@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics;
 
 namespace dotSrc_dotBit
 {
@@ -30,13 +31,15 @@ namespace dotSrc_dotBit
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _VERSION_ = "1.0.2";
+        private const string _VERSION_ = "1.0.3";
 
         private const string sourceSuffix = "src"; // unused
         private const string binarySuffix = "bin";
+        private const string simulationBinarySuffix = "simbin";
         private const string zipSuffix = "zip";
         private const string sevenZipSuffix = "7z";
         private const string twoCfSuffix = "2cf";
+        private const string blbSuffix = "blb";
 
         private const string DEVICE_DESCRIPTION = "DEVICE_DESCRIPTION";
         private const string PRJ_NAME = "PRJ_NAME";
@@ -46,6 +49,7 @@ namespace dotSrc_dotBit
         private string sevenZipFileName;    // [fullname]_src.7z        
         private string srcFolderPath;       // 
         private string binTargetPLAN1ADDRESSxxxPath;
+        private string binSimulatorProjectPath;
 
         private bool readyToGenerate = false;
 
@@ -432,6 +436,46 @@ namespace dotSrc_dotBit
                 LogWrite($"FINISHED");
             }
 
+            // simulation binaries
+            if (IsSimulationZipGenerationEnabled.IsChecked == true)
+            {
+                progressBarWindow.ProgressBarLabel.Text = $"Sto generando i binari per la simulazione";
+
+                // check if a file with the same name already exists: in this case append date and hour to the name of the archive
+                if (File.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}.{zipSuffix}")) ||
+                    Directory.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}")))
+                {
+                    string caption = "Archivio .zip dei binari già esistente";
+                    string msg = $"Sovrascrivere il file {System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}.{zipSuffix}")}?\nCliccando No, all'archivio verranno accodate data e ora di creazione. ";
+                    MessageBoxResult binDialogResult = System.Windows.MessageBox.Show(msg, caption, MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+                    // if the overwriting was chosen, then delete the old files or directories
+                    if (binDialogResult == MessageBoxResult.Yes)
+                    {
+                        if (File.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}.{zipSuffix}")))
+                        {
+                            File.Delete(System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}.{zipSuffix}"));
+                        }
+                        if (Directory.Exists(System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}")))
+                        {
+                            Directory.Delete(System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}"));
+                        }
+                    }
+                    if (binDialogResult == MessageBoxResult.No)
+                    {
+                        fullName += $"_{System.DateTime.Now.ToString("ddMMyyyy_hhmm")}";
+                        // fullName += $"{System.DateTime.Now.Day}{System.DateTime.Now.Month}{System.DateTime.Now.Year}_{System.DateTime.Now.Hour}{System.DateTime.Now.Minute}{System.DateTime.Now.Second}";
+                    }
+                }
+
+                // create the simulation binaries
+                LogWrite($"Generation at the path \"{destinationPath}\" of the zip-archive of simulation binaries named \"{fullName}_{simulationBinarySuffix}.{zipSuffix}\"");
+
+                PrepareSimulatorBinariesFolder(destinationPath);
+
+                LogWrite($"FINISHED");
+            }
+
+
             // hide the progress bar
             progressBarWindow.Hide();
 
@@ -498,6 +542,15 @@ namespace dotSrc_dotBit
             //
         }
 
+        private void IsSimulationZipGenerationEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            //
+        }
+
+        private void IsSimulationZipGenerationEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            //
+        }
 
 
         private void LogWrite(string str)
@@ -508,6 +561,119 @@ namespace dotSrc_dotBit
         private void LogClear()
         {
             StringLog.Text = string.Empty;
+        }
+
+        private void PrepareSimulatorBinariesFolder(string destinationPath)
+        {
+            // look for the Simulator directory and check if it is populated
+            string binSimulatorPath = System.IO.Path.Combine(srcFolderPath, $"Bin", $"Simulator");
+            if (!Directory.Exists(binSimulatorPath))
+            {
+                LogWrite($"Directory {binSimulatorPath} was not found: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+ 
+            var arrSimulatorDirectories = Directory.GetDirectories(binSimulatorPath);
+            if (arrSimulatorDirectories.Length == 0)
+            {
+                LogWrite($"Directory {binSimulatorPath} is empty: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+            else if (arrSimulatorDirectories.Length > 1)
+            {
+                LogWrite($"Directory {binSimulatorPath} contains two sub-directories: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+
+            LogWrite($"Found one directory \"{binSimulatorProjectPath}\"");
+            binSimulatorProjectPath = arrSimulatorDirectories.FirstOrDefault();
+
+            var files = Directory.GetFiles(binSimulatorProjectPath);
+
+            if (files.Length == 0)
+            {
+                LogWrite($"Directory {binSimulatorProjectPath} is empty: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+
+            // add to directory the files related to the calculation of the crc
+            string crcBat = @".\CRC\crc.bat";
+            string crcExe = @".\CRC\CRC.exe";
+
+            File.Copy(crcBat, $"{binSimulatorProjectPath}\\crc.bat", true);
+            File.Copy(crcExe, $"{binSimulatorProjectPath}\\CRC.exe", true);
+
+            // check CRC
+            var process = new Process();
+
+            var startInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = binSimulatorProjectPath,
+                WindowStyle = ProcessWindowStyle.Normal,
+                FileName = $"cmd.exe",
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+            };
+            process.StartInfo = startInfo;
+
+            process.Start();
+
+            /* passare per argomento al batch il file .blb */
+            process.StandardInput.WriteLine($"crc.bat {binSimulatorProjectPath.Substring(binSimulatorPath.Length + 1)}.{blbSuffix}");
+            process.StandardInput.WriteLine($"exit");
+
+            // 2 seconds are more than enough to end the CRC validation
+            process.WaitForExit(2000);
+
+            var tempOP = process.StandardOutput.ReadToEnd().Split(Environment.NewLine);
+
+            process.Close();
+
+            // delete the just-added files
+            File.Delete($"{binSimulatorProjectPath}\\crc.bat");
+            File.Delete($"{binSimulatorProjectPath}\\CRC.exe");
+
+            
+            foreach (var line in tempOP)
+            {
+                LogWrite(line);
+            }
+
+            if (tempOP.Length < 3)
+            {
+                LogWrite($"Unexpected output of cmd.exe during CRC validation: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+            var penultimateRow = tempOP[tempOP.Length-3];
+
+            int? crcErrorLevel;
+            try
+            {
+                crcErrorLevel = int.Parse(penultimateRow.Split(' ').Last());
+            }
+            catch (Exception)
+            {
+                LogWrite($"Unexpected value of %ERRORLEVEL% during CRC validation: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+
+            // if the process fails (i.e. %errorlevel% != 0) then abort generation of simulation binaries
+            if (crcErrorLevel != 0 || crcErrorLevel == null) 
+            {
+                LogWrite($"CRC check failed: Simulator binaries cannot be generated");
+                binSimulatorProjectPath = null;
+                return;
+            }
+
+            // create the output file
+            ZipFile.CreateFromDirectory(binSimulatorProjectPath, System.IO.Path.Combine(destinationPath, $"{fullName}_{simulationBinarySuffix}.{zipSuffix}"), CompressionLevel.Optimal, true);
         }
 
         private void PrepareTargetBinariesFolder(string targetPlanAddressxxxPath, string destinationPath)

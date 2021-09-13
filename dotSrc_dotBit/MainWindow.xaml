@@ -79,7 +79,10 @@
             <CheckBox  x:Name="IsSrc7zipGenerationEnabled" Grid.Row="8" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsSrc7zipGenerationEnabled_Checked" Unchecked="IsSrc7zipGenerationEnabled_Unchecked" ToolTip="Spuntare la casella per generare l'archivio 7zip dei sorgenti"></CheckBox>
             <TextBlock x:Name="LabelSrc7zipGeneration" Text="archivio 7 zip dei sorgenti" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,50,0"></TextBlock>
             <CheckBox  x:Name="IsBinZipGenerationEnabled" Grid.Row="8" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsBinZipGenerationEnabled_Checked" Unchecked="IsBinZipGenerationEnabled_Unchecked" ToolTip="Spuntare la casella per generare l'archivio zip dei binari"></CheckBox>
-            <TextBlock x:Name="LabelBinZipGeneration" Text="archivio zip dei binari" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock x:Name="LabelBinZipGeneration" Text="archivio zip dei binari" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"  Margin="0,0,50,0"></TextBlock>
+            <CheckBox  x:Name="IsSimulationZipGenerationEnabled" Grid.Row="8" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False" Checked="IsSimulationZipGenerationEnabled_Checked" Unchecked="IsSimulationZipGenerationEnabled_Unchecked" ToolTip="Spuntare la casella per generare i binari per il simulatore"></CheckBox>
+            <TextBlock x:Name="LabelSimulationZipGeneration" Text="zip dei binari per simulazione" Grid.Row="8" Grid.Column="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"  Margin="0,0,50,0"></TextBlock>
+
         </StackPanel>
         
         <!-- 10th row-->
