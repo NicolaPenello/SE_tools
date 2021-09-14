@@ -628,11 +628,11 @@ namespace dotSrc_dotBit
             process.StandardInput.WriteLine($"exit");
 
             // 2 seconds are more than enough to end the CRC validation
-            process.WaitForExit(2000);
+            process.WaitForExit();
 
             var tempOP = process.StandardOutput.ReadToEnd().Split(Environment.NewLine);
 
-            process.Close();
+            process.Kill(true);
 
             // delete the just-added files
             File.Delete($"{binSimulatorProjectPath}\\crc.bat");
